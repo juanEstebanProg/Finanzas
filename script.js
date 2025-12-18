@@ -8,6 +8,14 @@ class FinanceApp {
                 meDeben: []
             }
         };
+        
+        // Helper function to get local date in YYYY-MM-DD format
+        this.getLocalDateString = (date = new Date()) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
         this.currentDate = new Date();
         this.selectedDate = new Date();
         this.filteredMovements = [];
@@ -69,7 +77,7 @@ class FinanceApp {
 
     login() {
         // Redirect to GitHub OAuth
-        const clientId = 'Ov23liqB78H3oprtrrWG'; // You'll need to set this up
+        const clientId = 'Ov23liqB78H3oprtrrWG'; 
         const redirectUri = encodeURIComponent(window.location.origin + '/callback');
         const scope = 'repo';
         
@@ -683,7 +691,7 @@ class FinanceApp {
                 description: debtType === 'debo' 
                     ? `Abono a "${debt.person}" - ${debt.description || 'Sin descripción'}`
                     : `Me abono "${debt.person}" - ${debt.description || 'Sin descripción'}`,
-                date: new Date().toISOString().split('T')[0], // Today's date
+                date: this.getLocalDateString(), // Today's date
                 timestamp: new Date().toISOString()
             };
             
@@ -702,7 +710,7 @@ class FinanceApp {
                         description: debtType === 'debo' 
                             ? `Pago final deuda "${debt.person}" - ${debt.description || 'Sin descripción'}`
                             : `Me paga "${debt.person}" - ${debt.description || 'Sin descripción'}`,
-                        date: new Date().toISOString().split('T')[0],
+                        date: this.getLocalDateString(),
                         timestamp: new Date().toISOString()
                     };
                     this.data.movements.push(finalPaymentMovement);
@@ -736,7 +744,7 @@ class FinanceApp {
                         description: debtType === 'debo' 
                             ? `Pago final deuda "${debt.person}" - ${debt.description || 'Sin descripción'}`
                             : `Me paga "${debt.person}" - ${debt.description || 'Sin descripción'}`,
-                        date: new Date().toISOString().split('T')[0],
+                        date: this.getLocalDateString(),
                         timestamp: new Date().toISOString()
                     };
                     this.data.movements.push(finalPaymentMovement);
