@@ -1,0 +1,70 @@
+# Configuración para GitHub Pages
+
+## Variables de Configuración
+# Reemplaza estos valores con tus datos reales
+
+# Tu Client ID de GitHub OAuth
+GITHUB_CLIENT_ID=tu_client_id_aqui
+
+# URL de tu aplicación (cuando esté desplegada)
+APP_URL=https://tu-usuario.github.io/finanzas-personales
+
+# Nombre de tu repositorio
+REPO_NAME=finanzas-personales
+
+# Tu nombre de usuario de GitHub
+GITHUB_USERNAME=tu-usuario
+
+## Pasos para Configurar GitHub OAuth
+
+### 1. Crear OAuth App
+1. Ve a GitHub → Settings → Developer settings → OAuth Apps
+2. Click "New OAuth App"
+3. Completa:
+   - Application name: "Finanzas Personales"
+   - Homepage URL: https://tu-usuario.github.io/finanzas-personales
+   - Authorization callback URL: https://tu-usuario.github.io/finanzas-personales/callback.html
+
+### 2. Obtener Client ID
+1. Después de crear la app, obtendrás un Client ID
+2. Copia ese Client ID
+
+### 3. Configurar la Aplicación
+1. Abre el archivo `script.js`
+2. Busca la línea 74: `const clientId = 'YOUR_GITHUB_CLIENT_ID';`
+3. Reemplaza `'YOUR_GITHUB_CLIENT_ID'` con tu Client ID real
+4. Guarda el archivo
+
+### 4. Subir a GitHub
+1. Crea un nuevo repositorio en GitHub
+2. Sube todos los archivos
+3. Ve a Settings → Pages
+4. Selecciona "Deploy from a branch"
+5. Elige "main" branch y "/ (root)"
+6. ¡Listo!
+
+## Archivos Incluidos
+
+- `index.html` - Página principal de la aplicación
+- `styles.css` - Estilos CSS completos
+- `script.js` - Lógica JavaScript de la aplicación
+- `callback.html` - Página de callback para OAuth
+- `README.md` - Documentación completa
+- `package.json` - Configuración del proyecto
+- `.gitignore` - Archivos a ignorar en git
+- `config.example` - Este archivo de configuración
+
+## Notas Importantes
+
+- La aplicación funciona sin GitHub OAuth (modo local)
+- Para sincronización entre dispositivos, necesitas configurar GitHub OAuth
+- Los datos se almacenan localmente en el navegador cuando no usas GitHub
+- Con GitHub, los datos se sincronizan en la nube
+
+## Soporte
+
+Si tienes problemas:
+1. Verifica que el Client ID esté configurado correctamente
+2. Asegúrate de que la URL de callback coincida
+3. Revisa la consola del navegador para errores
+4. Consulta el README.md para más detalles

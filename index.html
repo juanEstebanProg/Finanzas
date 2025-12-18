@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzas Personales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">Finanzas Personales</h1>
+                <div class="header-actions">
+                    <button id="syncBtn" class="sync-btn" title="Sincronizar con GitHub">
+                        <svg class="sync-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                        </svg>
+                        <span class="sync-text">Sincronizar</span>
+                    </button>
+                    <div id="authSection">
+                        <button id="loginBtn" class="login-btn">Iniciar Sesión</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Resumen Hero Card -->
+            <div class="hero-card">
+                <div class="hero-content">
+                    <div class="balance-section">
+                        <span class="balance-label">Balance Total</span>
+                        <h1 id="balanceAmount" class="balance-amount">$0.00</h1>
+                    </div>
+                    <div class="last-movement">
+                        <span id="lastMovement" class="last-movement-text">No hay movimientos</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="navigation-tabs">
+                <button class="tab-btn active" data-tab="calendar">📅 Calendario</button>
+                <button class="tab-btn" data-tab="movements">💰 Movimientos</button>
+                <button class="tab-btn" data-tab="debts">📋 Deudas</button>
+                <button class="tab-btn" data-tab="filters">🔍 Filtros</button>
+            </nav>
+
+            <!-- Calendar Tab -->
+            <div id="calendarTab" class="tab-content active">
+                <div class="calendar-section">
+                    <div class="calendar-header">
+                        <h2>Selecciona un Día</h2>
+                        <div class="current-date" id="currentDate"></div>
+                    </div>
+                    <div id="calendar" class="calendar"></div>
+                    
+                    <!-- Day Details -->
+                    <div id="dayDetails" class="day-details hidden">
+                        <div class="day-details-header">
+                            <h3 id="selectedDateTitle">Detalles del Día</h3>
+                            <button id="addMovementBtn" class="add-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 5v14M5 12h14"/>
+                                </svg>
+                                Agregar Movimiento
+                            </button>
+                        </div>
+                        <div id="dayMovements" class="movements-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Movements Tab -->
+            <div id="movementsTab" class="tab-content">
+                <div class="movements-section">
+                    <h2>Todos los Movimientos</h2>
+                    <div id="allMovements" class="movements-list"></div>
+                </div>
+            </div>
+
+            <!-- Debts Tab -->
+            <div id="debtsTab" class="tab-content">
+                <div class="debts-section">
+                    <div class="debts-header">
+                        <h2>Gestión de Deudas</h2>
+                        <div class="debt-tabs">
+                            <button id="deboTab" class="debt-tab-btn active">Debo</button>
+                            <button id="meDebenTab" class="debt-tab-btn">Me Deben</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Debo Section -->
+                    <div id="deboSection" class="debt-section active">
+                        <div class="debt-actions">
+                            <button id="addDebtBtn" class="add-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 5v14M5 12h14"/>
+                                </svg>
+                                Nueva Deuda
+                            </button>
+                        </div>
+                        <div id="deboList" class="debts-list"></div>
+                    </div>
+                    
+                    <!-- Me Deben Section -->
+                    <div id="meDebenSection" class="debt-section">
+                        <div class="debt-actions">
+                            <button id="addCreditBtn" class="add-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 5v14M5 12h14"/>
+                                </svg>
+                                Nueva Deuda de Otros
+                            </button>
+                        </div>
+                        <div id="meDebenList" class="debts-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Tab -->
+            <div id="filtersTab" class="tab-content">
+                <div class="filters-section">
+                    <h2>Filtros y Búsqueda</h2>
+                    
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label for="amountFilter">Filtrar por Monto</label>
+                            <div class="amount-filter">
+                                <input type="number" id="minAmount" placeholder="Monto mínimo" class="filter-input">
+                                <span class="filter-separator">-</span>
+                                <input type="number" id="maxAmount" placeholder="Monto máximo" class="filter-input">
+                            </div>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="descriptionFilter">Buscar por Descripción</label>
+                            <input type="text" id="descriptionFilter" placeholder="Ej: arrendo, salario..." class="filter-input">
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <button id="applyFilters" class="apply-filters-btn">Aplicar Filtros</button>
+                            <button id="clearFilters" class="clear-filters-btn">Limpiar</button>
+                        </div>
+                    </div>
+                    
+                    <div id="filteredResults" class="filtered-results"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-btn active" data-tab="calendar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <span>Calendario</span>
+            </button>
+            <button class="bottom-nav-btn" data-tab="movements">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v20M2 12h20"/>
+                </svg>
+                <span>Movimientos</span>
+            </button>
+            <button class="bottom-nav-btn" data-tab="debts">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10,9 9,9 8,9"/>
+                </svg>
+                <span>Deudas</span>
+            </button>
+            <button class="bottom-nav-btn" data-tab="filters">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                </svg>
+                <span>Filtros</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modals -->
+    <!-- Movement Modal -->
+    <div id="movementModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="movementModalTitle">Agregar Movimiento</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="movementForm" class="modal-form">
+                <div class="form-group">
+                    <label for="movementType">Tipo</label>
+                    <select id="movementType" required>
+                        <option value="income">Ingreso</option>
+                        <option value="expense">Egreso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="movementAmount">Monto</label>
+                    <input type="number" id="movementAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="movementDescription">Descripción</label>
+                    <input type="text" id="movementDescription" required>
+                </div>
+                <div class="form-group">
+                    <label for="movementDate">Fecha</label>
+                    <input type="date" id="movementDate" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn">Cancelar</button>
+                    <button type="submit" class="submit-btn">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Debt Modal -->
+    <div id="debtModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="debtModalTitle">Nueva Deuda</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="debtForm" class="modal-form">
+                <div class="form-group">
+                    <label for="debtPerson">Nombre de la Persona</label>
+                    <input type="text" id="debtPerson" required>
+                </div>
+                <div class="form-group">
+                    <label for="debtAmount">Monto</label>
+                    <input type="number" id="debtAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="debtDescription">Descripción (Opcional)</label>
+                    <input type="text" id="debtDescription">
+                </div>
+                <div class="form-group">
+                    <label for="debtDueDate">Fecha de Vencimiento</label>
+                    <input type="date" id="debtDueDate" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn">Cancelar</button>
+                    <button type="submit" class="submit-btn">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Abonar Deuda</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="paymentForm" class="modal-form">
+                <div class="form-group">
+                    <label for="paymentAmount">Monto a Abonar</label>
+                    <input type="number" id="paymentAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="newDueDate">Nueva Fecha de Vencimiento (Opcional)</label>
+                    <input type="date" id="newDueDate">
+                    <small>Deja vacío para mantener la fecha actual</small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn">Cancelar</button>
+                    <button type="submit" class="submit-btn">Abonar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- GitHub Login Modal -->
+    <div id="githubModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Conectar con GitHub</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-form">
+                <p>Para sincronizar tus datos entre dispositivos, necesitas conectarte con tu cuenta de GitHub.</p>
+                <div class="github-actions">
+                    <button id="githubLogin" class="github-login-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        Iniciar Sesión con GitHub
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

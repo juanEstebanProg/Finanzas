@@ -1,0 +1,48 @@
+{
+  "name": "finanzas-personales",
+  "version": "1.0.0",
+  "description": "Aplicación web para gestionar finanzas personales con sincronización GitHub",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 3000",
+    "serve": "npx serve .",
+    "build": "echo 'Static site - no build needed'",
+    "lint": "echo 'No linting configured'",
+    "test": "echo 'No tests configured'"
+  },
+  "keywords": [
+    "finanzas",
+    "personal",
+    "finanzas-personales",
+    "calendario",
+    "presupuesto",
+    "gastos",
+    "ingresos",
+    "deudas",
+    "sync",
+    "github",
+    "web-app",
+    "responsive"
+  ],
+  "author": "MiniMax Agent",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/finanzas-personales.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tu-usuario/finanzas-personales/issues"
+  },
+  "homepage": "https://tu-usuario.github.io/finanzas-personales",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

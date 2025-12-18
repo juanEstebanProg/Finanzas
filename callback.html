@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub OAuth Callback</title>
+</head>
+<body>
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h2>Procesando autenticación...</h2>
+        <p>Por favor espera mientras procesamos tu conexión con GitHub.</p>
+    </div>
+
+    <script>
+        // Handle GitHub OAuth callback
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        
+        if (code) {
+            // Exchange code for access token
+            fetch('/api/exchange-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access_token) {
+                    // Store token and redirect to main app
+                    localStorage.setItem('githubToken', data.access_token);
+                    window.location.href = '/';
+                } else {
+                    throw new Error('No access token received');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al autenticar con GitHub. Por favor intenta de nuevo.');
+                window.location.href = '/';
+            });
+        } else {
+            // No code parameter, redirect to main app
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
