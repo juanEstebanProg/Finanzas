@@ -69,7 +69,7 @@ class FinanceApp {
 
     login() {
         // Redirect to GitHub OAuth
-        const clientId = 'YOUR_GITHUB_CLIENT_ID'; // You'll need to set this up
+        const clientId = 'Ov23liqB78H3oprtrrWG'; 
         const redirectUri = encodeURIComponent(window.location.origin + '/callback');
         const scope = 'repo';
         
