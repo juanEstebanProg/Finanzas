@@ -69,7 +69,7 @@ class FinanceApp {
 
     login() {
         // Redirect to GitHub OAuth
-        const clientId = 'Ov23liqB78H3oprtrrWG'; 
+        const clientId = 'Ov23liqB78H3oprtrrWG'; // You'll need to set this up
         const redirectUri = encodeURIComponent(window.location.origin + '/callback');
         const scope = 'repo';
         
@@ -440,9 +440,20 @@ class FinanceApp {
         const form = document.getElementById('movementForm');
         const dateInput = document.getElementById('movementDate');
         
-        // Set default date to selected date
+        // Set default date to selected date - fix timezone issue
         if (this.selectedDate) {
-            dateInput.value = this.selectedDate.toISOString().split('T')[0];
+            // Format date as YYYY-MM-DD without timezone conversion
+            const year = this.selectedDate.getFullYear();
+            const month = String(this.selectedDate.getMonth() + 1).padStart(2, '0');
+            const day = String(this.selectedDate.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+        } else {
+            // Default to today
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
         }
         
         modal.classList.add('active');
@@ -453,12 +464,14 @@ class FinanceApp {
         const form = document.getElementById('movementForm');
         const formData = new FormData(form);
         
+        // Fix date issue by ensuring we use the date correctly
+        const selectedDateValue = document.getElementById('movementDate').value;
         const movement = {
             id: Date.now().toString(),
             type: document.getElementById('movementType').value,
             amount: parseFloat(document.getElementById('movementAmount').value),
             description: document.getElementById('movementDescription').value,
-            date: document.getElementById('movementDate').value,
+            date: selectedDateValue, // Use the date directly without timezone conversion
             timestamp: new Date().toISOString()
         };
         
@@ -515,8 +528,13 @@ class FinanceApp {
         
         title.textContent = type === 'debo' ? 'Nueva Deuda' : 'Nueva Deuda de Otros';
         
-        // Set minimum date to today
-        dueDateInput.min = new Date().toISOString().split('T')[0];
+        // Set minimum date to today - fix timezone issue
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const todayString = `${year}-${month}-${day}`;
+        dueDateInput.min = todayString;
         
         modal.classList.add('active');
         document.getElementById('debtPerson').focus();
@@ -583,11 +601,15 @@ class FinanceApp {
         const deboList = document.getElementById('deboList');
         const meDebenList = document.getElementById('meDebenList');
         
+        // Filter out fully paid debts (they get removed automatically)
+        const activeDebo = this.data.debts.debo.filter(debt => debt.paidAmount < debt.amount);
+        const activeMeDeben = this.data.debts.meDeben.filter(debt => debt.paidAmount < debt.amount);
+        
         // Sort debts by due date
-        const deboSorted = [...this.data.debts.debo].sort((a, b) => 
+        const deboSorted = activeDebo.sort((a, b) => 
             new Date(a.dueDate) - new Date(b.dueDate)
         );
-        const meDebenSorted = [...this.data.debts.meDeben].sort((a, b) => 
+        const meDebenSorted = activeMeDeben.sort((a, b) => 
             new Date(a.dueDate) - new Date(b.dueDate)
         );
         
@@ -596,7 +618,8 @@ class FinanceApp {
         if (deboSorted.length === 0) {
             deboList.innerHTML = `
                 <div class="empty-state">
-                    <p>No tienes deudas registradas</p>
+                    <p>No tienes deudas activas</p>
+                    <small>Las deudas pagadas se eliminan automáticamente</small>
                 </div>
             `;
         } else {
@@ -611,7 +634,8 @@ class FinanceApp {
         if (meDebenSorted.length === 0) {
             meDebenList.innerHTML = `
                 <div class="empty-state">
-                    <p>No tienes deudas de otros registradas</p>
+                    <p>No tienes deudas de otros activas</p>
+                    <small>Las deudas pagadas se eliminan automáticamente</small>
                 </div>
             `;
         } else {
@@ -643,15 +667,57 @@ class FinanceApp {
         
         const debt = this.data.debts[debtType].find(d => d.id === debtId);
         if (debt) {
+            const previousPaidAmount = debt.paidAmount;
             debt.paidAmount += paymentAmount;
+            
+            // Update due date if provided
             if (newDueDate) {
                 debt.dueDate = newDueDate;
+            }
+            
+            // Create automatic movement for the payment
+            const paymentMovement = {
+                id: Date.now().toString(),
+                type: debtType === 'debo' ? 'expense' : 'income',
+                amount: paymentAmount,
+                description: debtType === 'debo' 
+                    ? `Abono a "${debt.person}" - ${debt.description || 'Sin descripción'}`
+                    : `Me abono "${debt.person}" - ${debt.description || 'Sin descripción'}`,
+                date: new Date().toISOString().split('T')[0], // Today's date
+                timestamp: new Date().toISOString()
+            };
+            
+            this.data.movements.push(paymentMovement);
+            
+            // Check if debt is fully paid
+            const isDebtFullyPaid = debt.paidAmount >= debt.amount;
+            if (isDebtFullyPaid) {
+                // Create final payment movement if not already included
+                const remainingAmount = debt.amount - previousPaidAmount;
+                if (remainingAmount > 0) {
+                    const finalPaymentMovement = {
+                        id: (Date.now() + 1).toString(),
+                        type: debtType === 'debo' ? 'expense' : 'income',
+                        amount: remainingAmount,
+                        description: debtType === 'debo' 
+                            ? `Pago final deuda "${debt.person}" - ${debt.description || 'Sin descripción'}`
+                            : `Me paga "${debt.person}" - ${debt.description || 'Sin descripción'}`,
+                        date: new Date().toISOString().split('T')[0],
+                        timestamp: new Date().toISOString()
+                    };
+                    this.data.movements.push(finalPaymentMovement);
+                }
+                
+                // Remove the debt since it's fully paid
+                this.data.debts[debtType] = this.data.debts[debtType].filter(d => d.id !== debtId);
+                this.showNotification('Deuda completamente pagada y eliminada', 'success');
+            } else {
+                this.showNotification('Abono procesado correctamente', 'success');
             }
             
             this.saveData();
             this.render();
             this.closeModals();
-            this.showNotification('Abono procesado correctamente', 'success');
         }
     }
 
@@ -659,10 +725,32 @@ class FinanceApp {
         if (confirm('¿Estás seguro de que quieres marcar esta deuda como pagada?')) {
             const debt = this.data.debts[debtType].find(d => d.id === debtId);
             if (debt) {
+                const remainingAmount = debt.amount - debt.paidAmount;
+                
+                // Create automatic movement for the final payment
+                if (remainingAmount > 0) {
+                    const finalPaymentMovement = {
+                        id: Date.now().toString(),
+                        type: debtType === 'debo' ? 'expense' : 'income',
+                        amount: remainingAmount,
+                        description: debtType === 'debo' 
+                            ? `Pago final deuda "${debt.person}" - ${debt.description || 'Sin descripción'}`
+                            : `Me paga "${debt.person}" - ${debt.description || 'Sin descripción'}`,
+                        date: new Date().toISOString().split('T')[0],
+                        timestamp: new Date().toISOString()
+                    };
+                    this.data.movements.push(finalPaymentMovement);
+                }
+                
+                // Update debt to fully paid
                 debt.paidAmount = debt.amount;
+                
+                // Remove the debt since it's fully paid
+                this.data.debts[debtType] = this.data.debts[debtType].filter(d => d.id !== debtId);
+                
                 this.saveData();
                 this.render();
-                this.showNotification('Deuda marcada como pagada', 'success');
+                this.showNotification('Deuda marcada como pagada y eliminada', 'success');
             }
         }
     }
