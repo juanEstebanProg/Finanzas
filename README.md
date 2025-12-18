@@ -218,14 +218,6 @@ Una aplicación web completa para gestionar tus finanzas personales con sincroni
 4. Push a la rama
 5. Abre un Pull Request
 
-## 📄 Licencia
-
-Este proyecto está bajo la licencia MIT. Puedes usarlo libremente para proyectos personales y comerciales.
-
-## 👨‍💻 Autor
-
-Desarrollado por MiniMax Agent
-
 ---
 
 **¡Disfruta gestionando tus finanzas de manera inteligente! 💰📊**
