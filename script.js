@@ -16,6 +16,16 @@ class FinanceApp {
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         };
+
+        // Helper function to format numbers as Colombian pesos (no decimals, thousands separator)
+        this.formatPeso = (amount) => {
+            return parseInt(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        };
+
+        // Helper function to parse formatted peso input back to number
+        this.parsePeso = (formattedAmount) => {
+            return parseFloat(formattedAmount.replace(/\./g, ''));
+        };
         this.currentDate = new Date();
         this.selectedDate = new Date();
         this.filteredMovements = [];
@@ -77,7 +87,7 @@ class FinanceApp {
 
     login() {
         // Redirect to GitHub OAuth
-        const clientId = 'Ov23liqB78H3oprtrrWG'; 
+        const clientId = 'Ov23liqB78H3oprtrrWG'; // You'll need to set this up
         const redirectUri = encodeURIComponent(window.location.origin + '/callback');
         const scope = 'repo';
         
@@ -229,6 +239,22 @@ class FinanceApp {
                     this.closeModals();
                 }
             });
+        });
+
+        // Auto-format peso inputs in real-time
+        const pesoInputs = ['movementAmount', 'debtAmount', 'paymentAmount', 'minAmount', 'maxAmount'];
+        pesoInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('input', (e) => {
+                    // Remove all non-digits and format
+                    const value = e.target.value.replace(/\D/g, '');
+                    if (value) {
+                        const formatted = this.formatPeso(value);
+                        e.target.value = formatted;
+                    }
+                });
+            }
         });
     }
 
@@ -436,7 +462,7 @@ class FinanceApp {
                 </div>
             </div>
             <div class="movement-amount ${movement.type}">
-                ${movement.type === 'income' ? '+' : '-'}$${movement.amount.toFixed(2)}
+                ${movement.type === 'income' ? '+' : '-'}$${this.formatPeso(movement.amount)}
             </div>
         `;
         
@@ -477,7 +503,7 @@ class FinanceApp {
         const movement = {
             id: Date.now().toString(),
             type: document.getElementById('movementType').value,
-            amount: parseFloat(document.getElementById('movementAmount').value),
+            amount: this.parsePeso(document.getElementById('movementAmount').value),
             description: document.getElementById('movementDescription').value,
             date: selectedDateValue, // Use the date directly without timezone conversion
             timestamp: new Date().toISOString()
@@ -555,7 +581,7 @@ class FinanceApp {
         const debt = {
             id: Date.now().toString(),
             person: document.getElementById('debtPerson').value,
-            amount: parseFloat(document.getElementById('debtAmount').value),
+            amount: this.parsePeso(document.getElementById('debtAmount').value),
             description: document.getElementById('debtDescription').value,
             dueDate: document.getElementById('debtDueDate').value,
             paidAmount: 0,
@@ -581,13 +607,13 @@ class FinanceApp {
         div.innerHTML = `
             <div class="debt-header">
                 <div class="debt-person">${debt.person}</div>
-                <div class="debt-amount">$${remainingAmount.toFixed(2)}</div>
+                <div class="debt-amount">$${this.formatPeso(remainingAmount)}</div>
             </div>
             ${debt.description ? `<div class="debt-description">${debt.description}</div>` : ''}
             <div class="debt-meta">
                 <span>Vence: ${new Date(debt.dueDate).toLocaleDateString('es-ES')}</span>
-                <span>Total: $${debt.amount.toFixed(2)}</span>
-                ${debt.paidAmount > 0 ? `<span>Pagado: $${debt.paidAmount.toFixed(2)}</span>` : ''}
+                <span>Total: $${this.formatPeso(debt.amount)}</span>
+                ${debt.paidAmount > 0 ? `<span>Pagado: $${this.formatPeso(debt.paidAmount)}</span>` : ''}
             </div>
             <div class="debt-progress">
                 <div class="debt-progress-bar" style="width: ${progressPercentage}%"></div>
@@ -670,7 +696,7 @@ class FinanceApp {
         const form = document.getElementById('paymentForm');
         const debtId = form.dataset.debtId;
         const debtType = form.dataset.debtType;
-        const paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
+        const paymentAmount = this.parsePeso(document.getElementById('paymentAmount').value);
         const newDueDate = document.getElementById('newDueDate').value;
         
         const debt = this.data.debts[debtType].find(d => d.id === debtId);
@@ -765,8 +791,10 @@ class FinanceApp {
 
     // Filter Management
     applyFilters() {
-        const minAmount = parseFloat(document.getElementById('minAmount').value) || 0;
-        const maxAmount = parseFloat(document.getElementById('maxAmount').value) || Infinity;
+        const minAmountStr = document.getElementById('minAmount').value;
+        const maxAmountStr = document.getElementById('maxAmount').value;
+        const minAmount = minAmountStr ? this.parsePeso(minAmountStr) : 0;
+        const maxAmount = maxAmountStr ? this.parsePeso(maxAmountStr) : Infinity;
         const description = document.getElementById('descriptionFilter').value.toUpperCase();
         
         this.filteredMovements = this.data.movements.filter(movement => {
@@ -858,7 +886,7 @@ class FinanceApp {
         const balance = this.calculateBalance();
         const lastMovement = this.getLastMovement();
         
-        document.getElementById('balanceAmount').textContent = `$${balance.toFixed(2)}`;
+        document.getElementById('balanceAmount').textContent = `$${this.formatPeso(Math.abs(balance))}`;
         document.getElementById('balanceAmount').className = `balance-amount ${balance >= 0 ? 'income' : 'expense'}`;
         
         if (lastMovement) {
