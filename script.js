@@ -457,9 +457,11 @@ getMovementsForDate(date) {
             <div class="movement-details">
                 <div class="movement-description">${movement.description}</div>
                 <div class="movement-meta">
-                    <span>${movement.date.split('-').reverse().join('/')}</span>
+                    <span>${new Date(movement.timestamp).toLocaleDateString('es-CO')}</span>
 
-                    <span>${new Date(movement.timestamp).toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</span>
+
+                   <span>${new Date(movement.timestamp).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
+
                 </div>
             </div>
             <div class="movement-amount ${movement.type}">
