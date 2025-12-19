@@ -18,9 +18,10 @@ class FinanceApp {
         };
 
         // Helper function to format numbers as Colombian pesos (no decimals, thousands separator)
-        this.formatPeso = (amount) => {
-            return parseInt(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        };
+this.formatPeso = (amount) => {
+    return Math.trunc(amount).toLocaleString('es-CO');
+};
+
 
         // Helper function to parse formatted peso input back to number
         this.parsePeso = (formattedAmount) => {
@@ -401,12 +402,11 @@ class FinanceApp {
         this.renderDayDetails();
     }
 
-    getMovementsForDate(date) {
-        return this.data.movements.filter(movement => {
-            const movementDate = new Date(movement.date);
-            return movementDate.toDateString() === date.toDateString();
-        });
-    }
+getMovementsForDate(date) {
+    const localDateString = this.getLocalDateString(date);
+    return this.data.movements.filter(movement => movement.date === localDateString);
+}
+
 
     renderDayDetails() {
         const dayDetails = document.getElementById('dayDetails');
