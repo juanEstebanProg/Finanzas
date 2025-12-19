@@ -134,9 +134,11 @@
                         <div class="filter-group">
                             <label for="amountFilter">Filtrar por Monto</label>
                             <div class="amount-filter">
-                                <input type="number" id="minAmount" placeholder="Monto mínimo" class="filter-input">
+                                <input type="text" id="minAmount" placeholder="Monto mínimo" class="filter-input" inputmode="numeric">
+
                                 <span class="filter-separator">-</span>
-                                <input type="number" id="maxAmount" placeholder="Monto máximo" class="filter-input">
+                                <input type="text" id="maxAmount" placeholder="Monto máximo" class="filter-input" inputmode="numeric">
+
                             </div>
                         </div>
                         
@@ -210,7 +212,8 @@
                 </div>
                 <div class="form-group">
                     <label for="movementAmount">Monto</label>
-                    <input type="number" id="movementAmount" step="0.01" required>
+                    <input type="text" id="movementAmount" inputmode="numeric" required>
+
                 </div>
                 <div class="form-group">
                     <label for="movementDescription">Descripción</label>
@@ -242,7 +245,8 @@
                 </div>
                 <div class="form-group">
                     <label for="debtAmount">Monto</label>
-                    <input type="number" id="debtAmount" step="0.01" required>
+                    <input type="text" id="debtAmount" inputmode="numeric" required>
+
                 </div>
                 <div class="form-group">
                     <label for="debtDescription">Descripción (Opcional)</label>
@@ -270,7 +274,8 @@
             <form id="paymentForm" class="modal-form">
                 <div class="form-group">
                     <label for="paymentAmount">Monto a Abonar</label>
-                    <input type="number" id="paymentAmount" step="0.01" required>
+                    <input type="text" id="paymentAmount" inputmode="numeric" required>
+
                 </div>
                 <div class="form-group">
                     <label for="newDueDate">Nueva Fecha de Vencimiento (Opcional)</label>
