@@ -101,8 +101,7 @@ async syncData() {
 
     this.render();
 }
-document.getElementById('syncBtn').addEventListener('click', () => {
-    this.syncData();
+
 });
 
     saveData() {
@@ -203,8 +202,13 @@ document.getElementById('syncBtn').addEventListener('click', () => {
         });
     }
 
-    // Event Listeners
-    setupEventListeners() {
+// Event Listeners
+setupEventListeners() {
+
+    // 🔄 Sync button
+    document.getElementById('syncBtn').addEventListener('click', () => {
+        this.syncData();
+    });
         // Tab navigation
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
