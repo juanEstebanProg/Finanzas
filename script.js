@@ -8,7 +8,7 @@ class FinanceApp {
                 meDeben: []
             }
         };
-        
+        this.API_URL = "https://finanzas-production-b729.up.railway.app/data";
         // Helper function to get local date in YYYY-MM-DD format
         this.getLocalDateString = (date = new Date()) => {
             const year = date.getFullYear();
@@ -42,6 +42,10 @@ this.formatPeso = (amount) => {
         this.setupCalendar();
         this.render();
         this.setupAuth();
+        setInterval(() => {
+    this.syncData();
+}, 120000);
+
     }
 
     // Data Management
@@ -52,6 +56,57 @@ this.formatPeso = (amount) => {
         }
         this.filteredMovements = [...this.data.movements];
     }
+this.dataWrapper = {
+  updatedAt: Date.now(),
+  data: this.data
+};
+async fetchFromBackend() {
+    try {
+        const res = await fetch(this.API_URL);
+        if (!res.ok) throw new Error("No backend");
+        return await res.json();
+    } catch {
+        return null;
+    }
+}
+async pushToBackend(wrapper) {
+    await fetch(this.API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(wrapper)
+    });
+}
+async syncData() {
+    const localWrapper = {
+        updatedAt: Date.now(),
+        data: this.data
+    };
+
+    const remoteWrapper = await this.fetchFromBackend();
+
+    if (!remoteWrapper) {
+        // backend vacío → subir local
+        await this.pushToBackend(localWrapper);
+        this.showNotification("Datos subidos a la nube", "success");
+        return;
+    }
+
+    if (remoteWrapper.updatedAt > localWrapper.updatedAt) {
+        // backend gana
+        this.data = remoteWrapper.data;
+        localStorage.setItem("financeAppData", JSON.stringify(this.data));
+        this.showNotification("Datos actualizados desde la nube", "success");
+    } else {
+        // local gana
+        await this.pushToBackend(localWrapper);
+        this.showNotification("Cambios sincronizados", "success");
+    }
+
+    this.render();
+}
+document.getElementById('syncBtn').addEventListener('click', () => {
+    this.syncData();
+});
 
     saveData() {
         localStorage.setItem('financeAppData', JSON.stringify(this.data));
