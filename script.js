@@ -102,7 +102,7 @@ async syncData() {
     this.render();
 }
 
-});
+
 
     saveData() {
         localStorage.setItem('financeAppData', JSON.stringify(this.data));
@@ -223,10 +223,7 @@ setupEventListeners() {
             });
         });
 
-        // Sync button
-        document.getElementById('syncBtn').addEventListener('click', () => {
-            this.syncWithGitHub();
-        });
+
 
         // Modal handlers
         document.querySelectorAll('.modal-close, .cancel-btn').forEach(btn => {
@@ -1000,6 +997,3 @@ getMovementsForDate(date) {
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new FinanceApp();
 });
-
-// Make app globally available for button onclick handlers
-window.app = null;
