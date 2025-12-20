@@ -8,7 +8,7 @@ class FinanceApp {
                 meDeben: []
             }
         };
-        this.API_URL = "https://finanzas-production-b729.up.railway.app/data";
+        this.API_URL = "https://finanzas-backend-production-4fee.up.railway.app/data";
         // Helper function to get local date in YYYY-MM-DD format
         this.getLocalDateString = (date = new Date()) => {
             const year = date.getFullYear();
