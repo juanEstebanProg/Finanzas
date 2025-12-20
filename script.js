@@ -33,11 +33,44 @@ this.formatPeso = (amount) => {
         this.isAuthenticated = false;
         this.githubToken = null;
         
+        
+// === Backend configuration (Railway) ===
+this.API_BASE_URL = "https://finanzas-production-b729.up.railway.app";
+
+// Helper: get data from backend
+this.apiGetData = async () => {
+    try {
+        const res = await fetch(`${this.API_BASE_URL}/data`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!res.ok) throw new Error('Backend not available');
+        return await res.json();
+    } catch (err) {
+        console.warn('Falling back to localStorage:', err);
+        return null;
+    }
+};
+
+// Helper: save data to backend
+this.apiSaveData = async (data) => {
+    try {
+        await fetch(`${this.API_BASE_URL}/data`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    } catch (err) {
+        console.warn('Could not save to backend, saved locally only:', err);
+    }
+};
+
+
         this.init();
     }
 
-    init() {
-        this.loadData();
+    async init() {
+        await this.loadData();
         this.setupEventListeners();
         this.setupCalendar();
         this.render();
@@ -45,16 +78,24 @@ this.formatPeso = (amount) => {
     }
 
     // Data Management
-    loadData() {
-        const savedData = localStorage.getItem('financeAppData');
-        if (savedData) {
-            this.data = JSON.parse(savedData);
+    async loadData() {
+        // Try backend first
+        const backendData = await this.apiGetData();
+        if (backendData) {
+            this.data = backendData;
+            localStorage.setItem('financeAppData', JSON.stringify(this.data));
+        } else {
+            const savedData = localStorage.getItem('financeAppData');
+            if (savedData) {
+                this.data = JSON.parse(savedData);
+            }
         }
         this.filteredMovements = [...this.data.movements];
     }
 
     saveData() {
         localStorage.setItem('financeAppData', JSON.stringify(this.data));
+        this.apiSaveData(this.data);
     }
 
     // Authentication Setup
