@@ -2,7 +2,7 @@
 class FinanceApp {
     constructor() {
         this.data = {
-            movements: [],
+            movements: [],//xd
             debts: {
                 debo: [],
                 meDeben: []
