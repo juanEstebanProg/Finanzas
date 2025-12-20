@@ -56,7 +56,7 @@ this.formatPeso = (amount) => {
         }
         this.filteredMovements = [...this.data.movements];
     }
-
+//ya lo combie ole
 async fetchFromBackend() {
     try {
         const res = await fetch(this.API_URL);
