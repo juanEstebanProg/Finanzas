@@ -101,9 +101,6 @@ async syncData() {
 
     this.render();
 }
-
-
-
     saveData() {
         localStorage.setItem('financeAppData', JSON.stringify(this.data));
     }
